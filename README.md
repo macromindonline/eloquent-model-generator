@@ -1,11 +1,11 @@
-# Eloquent Model Generator
+# Eloquent Model Generator for lumen
 
 Eloquent Model Generator is a tool based on [Code Generator](https://github.com/krlove/code-generator) for generating Eloquent models.
 
 ## Installation
 Step 1. Add Eloquent Model Generator to your project:
 ```
-composer require krlove/eloquent-model-generator --dev
+composer require asamaru7/eloquent-model-generator-for-lumen --dev
 ```
 Step 2. Register `GeneratorServiceProvider`:
 ```php
