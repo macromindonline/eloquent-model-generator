@@ -29,7 +29,12 @@ class EloquentModelBuilder
      */
     public function __construct(DatabaseManager $databaseManager)
     {
-        $this->manager = $databaseManager->connection()->getDoctrineSchemaManager();
+        try {
+            $this->manager = $databaseManager->connection()->getDoctrineSchemaManager();
+        } catch (\Exception $e) {   // connection error
+            echo $e->getMessage();
+            return;
+        }
         $dp = $this->manager->getDatabasePlatform();
         $dp->registerDoctrineTypeMapping('enum', 'array');
         $dp->registerDoctrineTypeMapping('set', 'array');
