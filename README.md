@@ -16,6 +16,23 @@ Step 2. Register `GeneratorServiceProvider`:
 ```
 Step 3. Configure your database connection.
 
+Step 4. Edit bootstrap.php : append
+
+```php
+if (! function_exists('app_path')) {
+	/**
+	 * Get the path to the application folder.
+	 *
+	 * @param  string  $path
+	 * @return string
+	 */
+	function app_path($path = '')
+	{
+		return app('path').($path ? DIRECTORY_SEPARATOR.$path : $path);
+	}
+}
+```
+
 ## Usage
 Use
 ```
