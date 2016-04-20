@@ -47,6 +47,10 @@ class Generator
      */
     protected function resolveOutputPath(Config $config)
     {
-        return $config->get('output_path', app_path()) . '/' . $config->get('class_name') . '.php';
+        $path = $config->get('output_path', app_path());
+        if (!file_exists($path)) {
+            mkdir($path, 0755, true);
+        }
+        return $path . '/' . $config->get('class_name') . '.php';
     }
 }

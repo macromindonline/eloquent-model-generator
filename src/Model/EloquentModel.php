@@ -85,7 +85,7 @@ class EloquentModel extends ClassModel
         $method->setDocBlock(new DocBlockModel($docBlock));
 
         $this->addMethod($method);
-        $this->addProperty(new VirtualPropertyModel($name, $virtualPropertyType));
+        $this->addProperty((new VirtualPropertyModel($name, $virtualPropertyType))->setWritable(false));
 
         return $this;
     }

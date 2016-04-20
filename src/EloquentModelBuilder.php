@@ -31,8 +31,8 @@ class EloquentModelBuilder
     {
         $this->manager = $databaseManager->connection()->getDoctrineSchemaManager();
         $dp = $this->manager->getDatabasePlatform();
-        $dp->registerDoctrineTypeMapping('enum', 'string');
-        $dp->registerDoctrineTypeMapping('set', 'string');
+        $dp->registerDoctrineTypeMapping('enum', 'array');
+        $dp->registerDoctrineTypeMapping('set', 'array');
     }
 
     /**
@@ -246,7 +246,11 @@ class EloquentModelBuilder
             'json'                        => 'array',
             'timestamp without time zone' => 'string',
             'text'                        => 'string',
-            'bigint'                      => 'int'
+            'bigint'                      => 'int',
+            'string'                      => 'string',
+            'decimal'                     => 'float',
+            'datetime'                    => '\Carbon\Carbon',
+            'array'                       => 'mixed',   // todo test
         ];
 
         return array_key_exists($type, $typesMap) ? $typesMap[$type] : 'mixed';
