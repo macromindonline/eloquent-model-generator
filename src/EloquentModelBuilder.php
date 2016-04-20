@@ -8,7 +8,7 @@ use Illuminate\Database\DatabaseManager;
 use Krlove\CodeGenerator\Model\DocBlockModel;
 use Krlove\CodeGenerator\Model\NamespaceModel;
 use Krlove\CodeGenerator\Model\PropertyModel;
-use Krlove\CodeGenerator\Model\VirtualPropertyModel;
+use Krlove\EloquentModelGenerator\Model\VirtualPropertyModel;
 use Krlove\EloquentModelGenerator\Exception\GeneratorException;
 use Krlove\EloquentModelGenerator\Model\BelongsTo;
 use Krlove\EloquentModelGenerator\Model\BelongsToMany;
@@ -120,7 +120,8 @@ class EloquentModelBuilder
         foreach ($tableDetails->getColumns() as $column) {
             $model->addProperty(new VirtualPropertyModel(
                 $column->getName(),
-                $this->resolveType($column->getType()->getName())
+                $this->resolveType($column->getType()->getName()),
+                $column->getComment()
             ));
 
             if (!in_array($column->getName(), $primaryColumnNames)) {
