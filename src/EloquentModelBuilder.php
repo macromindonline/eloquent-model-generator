@@ -30,6 +30,9 @@ class EloquentModelBuilder
     public function __construct(DatabaseManager $databaseManager)
     {
         $this->manager = $databaseManager->connection()->getDoctrineSchemaManager();
+        $dp = $this->manager->getDatabasePlatform();
+        $dp->registerDoctrineTypeMapping('enum', 'string');
+        $dp->registerDoctrineTypeMapping('set', 'string');
     }
 
     /**
