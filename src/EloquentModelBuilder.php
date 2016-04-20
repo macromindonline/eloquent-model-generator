@@ -80,7 +80,7 @@ class EloquentModelBuilder
      */
     protected function setCustomProperties(EloquentModel $model, Config $config)
     {
-        if ($config->get('no_timestamps') !== false) {
+        if ($config->get('no_timestamps') == true) {
             $pNoTimestamps = new PropertyModel('timestamps', 'public', false);
             $pNoTimestamps->setDocBlock(
                 new DocBlockModel('Indicates if the model should be timestamped.', '', '@var bool')
@@ -116,6 +116,8 @@ class EloquentModelBuilder
         $tableDetails       = $this->manager->listTableDetails($model->getTableName());
         $primaryColumnNames = $tableDetails->getPrimaryKey()->getColumns();
 
+        $hasTimestamps = false;
+        $isAutoincrement = true;
         $columnNames = [];
         foreach ($tableDetails->getColumns() as $column) {
             $model->addProperty(new VirtualPropertyModel(
@@ -124,9 +126,16 @@ class EloquentModelBuilder
                 $column->getComment()
             ));
 
-            if (!in_array($column->getName(), $primaryColumnNames)) {
-                $columnNames[] = $column->getName();
+            if (in_array($column->getName(), $primaryColumnNames)) {
+                $isAutoincrement = $column->getAutoincrement();
             }
+            if (in_array($column->getName(), ['created_at', 'updated_at'])) {
+                $hasTimestamps = true;
+                continue;   // remove timestamps
+            }
+            //if (!in_array($column->getName(), $primaryColumnNames)) {
+                $columnNames[] = $column->getName();
+            //}
         }
 
         $fillableProperty = new PropertyModel('fillable');
@@ -135,6 +144,43 @@ class EloquentModelBuilder
             ->setDocBlock(new DocBlockModel('@var array'));
         $model->addProperty($fillableProperty);
 
+        if (!empty($primaryColumnNames)) {
+            $comments = [];
+            if (count($primaryColumnNames) > 1) {
+                $comments[] = 'Eloquent doesn\'t support composite primary keys : ' . implode(', ', $primaryColumnNames);
+                $comments[] = '';
+                $primaryColumnNames = [$primaryColumnNames[0]];
+            }
+            if ($primaryColumnNames[0] != 'id') {
+                $comments[] = '@var string';
+                $primatyProperty = new PropertyModel('primaryKey');
+                $primatyProperty->setAccess('protected')
+                    ->setValue($primaryColumnNames[0])
+                    ->setDocBlock((new DocBlockModel())->addContent($comments));
+                $model->addProperty($primatyProperty);
+            }
+
+            $comments = [];
+            if (!$isAutoincrement) {
+                $comments[] = ['Indicates if the IDs are auto-incrementing.', '', '@var bool'];
+                $autoincrementProperty = new PropertyModel('incrementing');
+                $autoincrementProperty->setAccess('public')
+                    ->setValue(false)
+                    ->setDocBlock((new DocBlockModel())->addContent($comments));
+                $model->addProperty($autoincrementProperty);
+            }
+
+            $comments = [];
+            if (!$hasTimestamps) {
+                $comments[] = ['Indicates if the model should be timestamped.', '', '@var bool'];
+                $timestampsProperty = new PropertyModel('timestamps');
+                $timestampsProperty->setAccess('public')
+                    ->setValue(false)
+                    ->setDocBlock((new DocBlockModel())->addContent($comments));
+                $model->addProperty($timestampsProperty);
+            }
+        }
+        
         return $this;
     }
 

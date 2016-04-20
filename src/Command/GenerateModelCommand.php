@@ -55,10 +55,14 @@ class GenerateModelCommand extends Command
         $config = [];
 
         foreach ($this->getArguments() as $argument) {
-            $config[$argument[0]] = $this->argument($argument[0]);
+            if (!empty($this->argument($argument[0]))) {
+                $config[$argument[0]] = $this->argument($argument[0]);
+            }
         }
         foreach ($this->getOptions() as $option) {
-            $config[$option[0]] = $this->option($option[0]);
+            if (!empty($this->option($option[0]))) {
+                $config[$option[0]] = $this->option($option[0]);
+            }
         }
 
         return new Config($config);
