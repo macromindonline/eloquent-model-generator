@@ -124,7 +124,12 @@ class EloquentModelBuilder
         $hasTimestamps = false;
         $isAutoincrement = true;
         $columnNames = [];
+        $dates = [];
         foreach ($tableDetails->getColumns() as $column) {
+            $type = $this->resolveType($column->getType()->getName());
+            if (strcmp($type, '\Carbon\Carbon') == 0) {
+                $dates[] = $column->getName();
+            }
             $model->addProperty(new VirtualPropertyModel(
                 $column->getName(),
                 $this->resolveType($column->getType()->getName()),
@@ -139,7 +144,7 @@ class EloquentModelBuilder
                 continue;   // remove timestamps
             }
             //if (!in_array($column->getName(), $primaryColumnNames)) {
-                $columnNames[] = $column->getName();
+            $columnNames[] = $column->getName();
             //}
         }
 
@@ -148,6 +153,14 @@ class EloquentModelBuilder
             ->setValue($columnNames)
             ->setDocBlock(new DocBlockModel('@var array'));
         $model->addProperty($fillableProperty);
+
+        if (!empty($dates)) {
+            $datesProperty = new PropertyModel('dates');
+            $datesProperty->setAccess('protected')
+                ->setValue($dates)
+                ->setDocBlock(new DocBlockModel('@var array'));
+            $model->addProperty($datesProperty);
+        }
 
         if (!empty($primaryColumnNames)) {
             $comments = [];
@@ -185,7 +198,7 @@ class EloquentModelBuilder
                 $model->addProperty($timestampsProperty);
             }
         }
-        
+
         return $this;
     }
 
@@ -288,7 +301,7 @@ class EloquentModelBuilder
     protected function resolveType($type)
     {
         static $typesMap = [
-            'date'                        => 'string',
+            'date'                        => '\Carbon\Carbon',
             'character varying'           => 'string',
             'boolean'                     => 'boolean',
             'name'                        => 'string',
