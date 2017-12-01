@@ -38,7 +38,7 @@ class GenerateModelCommand extends Command
     /**
      * Executes the command
      */
-    public function fire()
+    public function handle()
     {
         $config = $this->createConfig();
 
