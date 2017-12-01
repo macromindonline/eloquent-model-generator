@@ -1,5 +1,5 @@
 {
-  "name": "macromindonline/lumen-model-generator",
+  "name": "macromindonline/eloquent-model-generator",
   "description": "Eloquent Model Generator",
   "license": "MIT",
   "autoload": {
